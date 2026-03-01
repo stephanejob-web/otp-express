@@ -26,9 +26,16 @@ app.post("/send-otp", async (req, res) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
 
   // Le code expire dans 5 minutes
+  // Date.now()              → timestamp actuel en millisecondes  ex: 1700000000000
+  // 5 * 60 * 1000           → 5 min en millisecondes            = 300000
+  // expiresAt               → timestamp d'expiration            ex: 1700000300000
   const expiresAt = Date.now() + 5 * 60 * 1000;
 
   // Sauvegarder dans notre "base de données" temporaire
+  // otpStore ressemble à ça après cette ligne :
+  // {
+  //   "alice@gmail.com": { code: "482915", expiresAt: 1700000300000 }
+  // }
   otpStore[email] = { code, expiresAt };
 
   // Envoyer l'email
