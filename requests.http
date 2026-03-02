@@ -1,0 +1,16 @@
+### Envoyer un OTP
+POST http://localhost:4789/send-otp
+Content-Type: application/json
+
+{
+  "email": "darksh3ll.js@gmail.com"
+}
+
+### Vérifier un OTP
+POST http://localhost:4789/verify-otp
+Content-Type: application/json
+
+{
+  "email": "darksh3ll.js@gmail.com",
+  "code": "535521"
+}

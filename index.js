@@ -20,10 +20,12 @@ const transporter = nodemailer.createTransport({
 
 // --- Route 1 : envoyer l'OTP ---
 app.post("/send-otp", async (req, res) => {
+  console.log("1. Requête reçue pour:", req.body);
   const { email } = req.body;
 
   // Générer un code à 6 chiffres
   const code = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log("2. Code généré:", code);
 
   // Le code expire dans 5 minutes
   // Date.now()              → timestamp actuel en millisecondes  ex: 1700000000000
@@ -39,14 +41,19 @@ app.post("/send-otp", async (req, res) => {
   otpStore[email] = { code, expiresAt };
 
   // Envoyer l'email
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Votre code de vérification",
-    text: `Votre code est : ${code}. Il expire dans 5 minutes.`,
-  });
-
-  res.json({ message: "Code envoyé par email." });
+  console.log("3. Tentative d'envoi email...");
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Votre code de vérification",
+      text: `Votre code est : ${code}. Il expire dans 5 minutes.`,
+    });
+    res.json({ message: "Code envoyé par email." });
+  } catch (err) {
+    console.error("Erreur envoi email:", err.message);
+    res.status(500).json({ message: "Erreur envoi email.", error: err.message });
+  }
 });
 
 // --- Route 2 : vérifier l'OTP et retourner un token ---
@@ -75,8 +82,11 @@ app.post("/verify-otp", (req, res) => {
 
   // Générer un JWT token
   const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  console.log("Token JWT généré pour:", email);
+  console.log("Token:", token);
+  console.log("Payload décodé:", jwt.decode(token));
 
   res.json({ message: "Email vérifié !", token });
 });
 
-app.listen(3000, () => console.log("Serveur démarré sur http://localhost:3000"));
+app.listen(4789, () => console.log("Serveur démarré sur http://localhost:4789"));
