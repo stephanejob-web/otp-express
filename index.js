@@ -40,8 +40,6 @@ app.post("/send-otp", async (req, res) => {
   // }
   otpStore[email] = { code, expiresAt };
 
-  // Envoyer l'email
-  console.log("3. Tentative d'envoi email...");
   try {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
